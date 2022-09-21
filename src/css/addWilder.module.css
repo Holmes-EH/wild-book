@@ -1,0 +1,29 @@
+.form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+.fieldset {
+	border: none;
+	display: grid;
+	grid-template-columns: 30% 70%;
+	gap: 15px;
+	margin: 0;
+	padding: 0;
+	min-width: 400px;
+}
+
+.skillsInput {
+	border: none;
+	display: grid;
+	grid-template-columns: auto auto;
+	gap: 15px;
+	margin: 0;
+	padding: 0;
+	min-width: 400px;
+}
+
+.labels {
+	text-align: right;
+}
