@@ -1,15 +1,14 @@
-const DataSource = require('typeorm').DataSource
+import { DataSource } from 'typeorm'
+import { Skill } from './entity/Skill'
+import { Wilder } from './entity/Wilder'
+import { Grade } from './entity/Grade'
 
-module.exports = {
-	dataSource: new DataSource({
-		type: 'sqlite',
-		database: './wildersdb.sqlite',
-		synchronize: true,
-		entities: [
-			require('./entity/Wilder'),
-			require('./entity/Skill'),
-			require('./entity/Grades'),
-		],
-		logging: ['error'],
-	}),
-}
+const AppDataSource = new DataSource({
+	type: 'sqlite',
+	database: './wildersdb.sqlite',
+	synchronize: true,
+	entities: [Wilder, Skill, Grade],
+	logging: ['error'],
+})
+
+export default AppDataSource

@@ -1,10 +1,14 @@
-const dataSource = require('../utils').dataSource
-const Skill = require('../entity/Skill')
+import AppDataSource from '../utils'
+import { IController } from '../interfaces/interfaces'
 
-module.exports = {
+import { Skill } from '../entity/Skill'
+
+const skillRepository = AppDataSource.getRepository(Skill)
+
+const skillController: IController = {
 	create: async (req, res) => {
 		try {
-			await dataSource.getRepository(Skill).save(req.body)
+			await skillRepository.save(req.body)
 			res.status(201).send('Skill Created !')
 		} catch (error) {
 			console.error('Error ->', error)
@@ -13,7 +17,7 @@ module.exports = {
 	},
 	findAll: async (req, res) => {
 		try {
-			const skills = await dataSource.getRepository(Skill).find()
+			const skills = await skillRepository.find()
 			if (skills.length > 0) {
 				res.status(200).send(skills)
 			} else {
@@ -26,18 +30,13 @@ module.exports = {
 	},
 	update: async (req, res) => {
 		try {
-			const { id, name } = req.body
-			const skillToUpdate = await dataSource
-				.getRepository(Skill)
-				.findOneBy({ id: id })
+			const { id } = req.body
+			const skillToUpdate = await skillRepository.findOneBy({ id })
 			if (skillToUpdate === null) {
 				res.status(404).send('Skill not found')
 			} else {
 				try {
-					const updatedSkill = await dataSource
-						.getRepository(Skill)
-						.save(req.body)
-					//.update(id, { name: name })
+					const updatedSkill = await skillRepository.save(req.body)
 					res.status(200).send(updatedSkill)
 				} catch (error) {
 					res.status(500).send(
@@ -53,9 +52,7 @@ module.exports = {
 	delete: async (req, res) => {
 		try {
 			const { id } = req.body
-			const deletedSkill = await dataSource
-				.getRepository(Skill)
-				.delete(id)
+			const deletedSkill = await skillRepository.delete(id)
 			if (deletedSkill.affected === 0) {
 				res.status(404).send('Could not delete. Skill not found')
 			} else {
@@ -67,3 +64,5 @@ module.exports = {
 		}
 	},
 }
+
+export default skillController

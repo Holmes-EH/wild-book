@@ -1,31 +1,20 @@
-const EntitySchema = require('typeorm').EntitySchema
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
+import { Grade } from './Grade'
 
-module.exports = new EntitySchema({
-	name: 'Wilder',
-	columns: {
-		id: {
-			primary: true,
-			type: 'int',
-			generated: true,
-		},
-		name: {
-			type: 'text',
-		},
-		description: {
-			type: 'text',
-			nullable: true,
-		},
-		city: {
-			type: 'text',
-			nullable: true,
-		},
-	},
+@Entity()
+export class Wilder {
+	@PrimaryGeneratedColumn()
+	id: number
 
-	relations: {
-		grades: {
-			target: 'Grades',
-			type: 'one-to-many',
-			inverseSide: 'wilder',
-		},
-	},
-})
+	@Column()
+	name: string
+
+	@Column()
+	description: string
+
+	@Column()
+	city: string
+
+	@OneToMany(() => Grade, (grade) => grade.wilder)
+	grades: Grade[]
+}
