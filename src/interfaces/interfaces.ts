@@ -17,11 +17,17 @@ export interface IncomingGrades {
 	}
 }
 
-export interface IncomingWilder {
+export interface IBasicWilderProps {
 	id: number
 	name: string
 	city: string
 	description: string
+}
+
+export interface IWilderData extends IBasicWilderProps {
+	grades: ISkill[]
+}
+export interface IncomingWilder extends IBasicWilderProps {
 	grades: IncomingGrades[]
 }
 
@@ -33,14 +39,6 @@ export interface IWilderToEdit {
 	editCity: string
 	editDescription: string
 	editGrades: ISkill[]
-}
-
-export interface IWilderData {
-	id: number
-	name: string
-	city: string
-	description: string
-	grades: ISkill[]
 }
 
 export interface IWilderProps extends IWilderData {
