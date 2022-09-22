@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import AppDataSource from '../utils'
-import { IController } from '../interfaces/interfaces'
+import {
+	IController,
+	IIncomingGrade,
+	IIncomingWilder,
+} from '../interfaces/interfaces'
 
 import { Skill } from '../entity/Skill'
 import { Wilder } from '../entity/Wilder'
@@ -13,23 +17,22 @@ const gradeRepository = AppDataSource.getRepository(Grade)
 const wilderController: IController = {
 	create: async (req, res) => {
 		try {
-			const { name, city, description, grades } = req.body
+			const { name, city, description, grades }: IIncomingWilder =
+				req.body
 			const newWilder = {
 				name,
 				description,
 				city,
 			}
 			const wilderExists = await wilderRepository.findOneBy({ name })
-			const savedWilder = await wilderRepository.save(newWilder)
 			if (wilderExists !== null) {
 				res.status(400).send('Wilder exists, consider updating !')
 			} else {
-				const wilder = await wilderRepository.findOneBy({
-					id: savedWilder.id,
-				})
+				const savedWilder = await wilderRepository.save(newWilder)
+				const wilder = await wilderRepository.save(savedWilder)
 				if (wilder !== null) {
 					await Promise.all(
-						grades.map(async (grade: any) => {
+						grades.map(async (grade: IIncomingGrade) => {
 							const skillToAdd = await skillRepository.findOneBy({
 								id: grade.id,
 							})
@@ -42,8 +45,19 @@ const wilderController: IController = {
 							}
 						})
 					)
+					const newWilder = await wilderRepository.findOne({
+						where: {
+							id: savedWilder.id,
+						},
+						relations: {
+							grades: {
+								skill: true,
+							},
+						},
+					})
 					res.status(201).send({
 						message: 'Wilder Created !',
+						newWilder,
 					})
 				}
 			}
@@ -73,9 +87,10 @@ const wilderController: IController = {
 	},
 	update: async (req, res) => {
 		try {
-			const { id, name, city, description, grades } = req.body
+			const { id, name, city, description, grades }: IIncomingWilder =
+				req.body
 			const wilderToUpdate = await wilderRepository.findOne({
-				where: id,
+				where: { id },
 				relations: {
 					grades: {
 						skill: true,
@@ -89,11 +104,9 @@ const wilderController: IController = {
 					wilderToUpdate.name = name
 					wilderToUpdate.city = city
 					wilderToUpdate.description = description
-					const updatedWilder = await wilderRepository.save(
-						wilderToUpdate
-					)
+					await wilderRepository.save(wilderToUpdate)
 					await Promise.all(
-						grades.map(async (incomingGrade: any) => {
+						grades.map(async (incomingGrade: IIncomingGrade) => {
 							const gradeToUpdate = await gradeRepository.findOne(
 								{
 									where: {
@@ -119,6 +132,16 @@ const wilderController: IController = {
 							}
 						})
 					)
+					const updatedWilder = await wilderRepository.findOne({
+						where: {
+							id,
+						},
+						relations: {
+							grades: {
+								skill: true,
+							},
+						},
+					})
 					res.status(200).send({
 						message: 'Wilder Updated',
 						updatedWilder,

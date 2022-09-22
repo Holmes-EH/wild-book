@@ -10,3 +10,16 @@ export interface IGrade {
 	skillId: number
 	grade: number
 }
+
+export interface IIncomingGrade {
+	id: number
+	title: string
+	grade: number
+}
+export interface IIncomingWilder {
+	id?: number
+	name: string
+	city: string
+	description: string
+	grades: IIncomingGrade[]
+}
