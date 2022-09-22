@@ -27,3 +27,14 @@
 .labels {
 	text-align: right;
 }
+
+.actionButton {
+	position: unset;
+}
+.actionButton:disabled {
+	background-color: lightgray;
+	color: gray;
+	outline-color: lightgray;
+	pointer-events: none;
+	box-shadow: none;
+}

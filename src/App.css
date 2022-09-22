@@ -52,6 +52,25 @@ footer {
 	border-top: 2px solid #f76c6c;
 }
 
+button {
+	cursor: pointer;
+	outline: 1px solid #f76c6c;
+	border-radius: 5px;
+	border: none;
+	background: #fff;
+	padding: 0.5em;
+	color: #f76c6c;
+	transition: 0.3s ease;
+	position: sticky;
+	top: 20px;
+	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+	margin-bottom: 1em;
+}
+button:hover {
+	background: #f76c6c;
+	color: #fff;
+}
+
 /* 
    * card-layout. css 
    */
@@ -66,6 +85,10 @@ footer {
 	border: 1px solid #c9c9c9;
 	border-radius: 7px;
 	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	height: 100%;
 }
 
 .card > img:first-child {
@@ -138,4 +161,10 @@ footer {
 	border-radius: 9999px;
 	height: 20px;
 	width: 20px;
+}
+
+.actions {
+	margin-top: 1em;
+	display: flex;
+	justify-content: space-evenly;
 }
