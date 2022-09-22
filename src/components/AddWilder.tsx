@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import styles from '../css/addWilder.module.css'
 import Skill from './Skill'
-import { ISkill, IWilderToEdit } from '../interfaces/interfaces'
+import { ISkill, IWilderToEditToPass } from '../interfaces/interfaces'
 
 const AddWilder = ({
 	isEditing,
@@ -12,8 +12,8 @@ const AddWilder = ({
 	editCity,
 	editDescription,
 	editGrades,
-}: IWilderToEdit) => {
-	const [id, setId] = useState(editId)
+}: IWilderToEditToPass) => {
+	const [id] = useState(editId)
 	const [name, setName] = useState(editName || '')
 	const [city, setCity] = useState(editCity || '')
 	const [description, setDescription] = useState(editDescription || '')

@@ -4,17 +4,21 @@ import './App.css'
 import Wilder from './components/Wilder'
 import AddWilder from './components/AddWilder'
 
-import { IncomingWilder, IWilderData } from './interfaces/interfaces'
+import {
+	IncomingWilder,
+	IWilderData,
+	IWilderToEdit,
+} from './interfaces/interfaces'
 
 const App = () => {
 	const [wilders, setWilders] = useState<IWilderData[]>([])
 	const [addNewWilder, setAddNewWilder] = useState(false)
-	const [wilderToEdit, setWilderToEdit] = useState<any>({
+	const [wilderToEdit, setWilderToEdit] = useState<IWilderToEdit>({
 		isEditing: false,
-		name: '',
-		city: '',
-		description: '',
-		grades: [],
+		editName: '',
+		editCity: '',
+		editDescription: '',
+		editGrades: [],
 	})
 
 	const refactorData = (data: IncomingWilder[]): IWilderData[] => {
@@ -56,7 +60,13 @@ const App = () => {
 			<main className='container'>
 				<button
 					onClick={() => {
-						setWilderToEdit({})
+						setWilderToEdit({
+							isEditing: false,
+							editName: '',
+							editCity: '',
+							editDescription: '',
+							editGrades: [],
+						})
 						setAddNewWilder(!addNewWilder)
 					}}
 				>
@@ -66,11 +76,11 @@ const App = () => {
 					<AddWilder
 						isEditing={Object.hasOwn(wilderToEdit, 'id')}
 						setWilderToEdit={setWilderToEdit}
-						editId={wilderToEdit.id}
-						editName={wilderToEdit.name}
-						editCity={wilderToEdit.city}
-						editDescription={wilderToEdit.description}
-						editGrades={wilderToEdit.grades}
+						editId={wilderToEdit.editId}
+						editName={wilderToEdit.editName}
+						editCity={wilderToEdit.editCity}
+						editDescription={wilderToEdit.editDescription}
+						editGrades={wilderToEdit.editGrades}
 					/>
 				)}
 				<h2>Wilders</h2>
