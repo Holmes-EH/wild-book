@@ -33,12 +33,15 @@ export interface IncomingWilder extends IBasicWilderProps {
 
 export interface IWilderToEdit {
 	isEditing: boolean
-	setWilderToEdit: Dispatch<SetStateAction<any>>
 	editId?: number
 	editName: string
 	editCity: string
 	editDescription: string
 	editGrades: ISkill[]
+}
+
+export interface IWilderToEditToPass extends IWilderToEdit {
+	setWilderToEdit: Dispatch<SetStateAction<any>>
 }
 
 export interface IWilderProps extends IWilderData {
