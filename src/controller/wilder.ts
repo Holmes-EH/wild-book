@@ -89,6 +89,9 @@ const wilderController: IController = {
 					wilderToUpdate.name = name
 					wilderToUpdate.city = city
 					wilderToUpdate.description = description
+					const updatedWilder = await wilderRepository.save(
+						wilderToUpdate
+					)
 					await Promise.all(
 						grades.map(async (incomingGrade: any) => {
 							const gradeToUpdate = await gradeRepository.findOne(
@@ -118,6 +121,7 @@ const wilderController: IController = {
 					)
 					res.status(200).send({
 						message: 'Wilder Updated',
+						updatedWilder,
 					})
 				} catch (error) {
 					console.log(error)
