@@ -41,10 +41,15 @@ export interface IWilderToEdit {
 }
 
 export interface IWilderToEditToPass extends IWilderToEdit {
-	setWilderToEdit: Dispatch<SetStateAction<any>>
+	wilders: IWilderData[]
+	setWilderToEdit: Dispatch<SetStateAction<IWilderToEdit>>
+	setWilders: Dispatch<SetStateAction<IWilderData[]>>
+	setAddNewWilder: Dispatch<SetStateAction<boolean>>
 }
 
 export interface IWilderProps extends IWilderData {
+	wilders: IWilderData[]
 	setAddNewWilder: Dispatch<SetStateAction<boolean>>
-	setWilderToEdit: Dispatch<SetStateAction<any>>
+	setWilderToEdit: Dispatch<SetStateAction<IWilderToEdit>>
+	setWilders: Dispatch<SetStateAction<IWilderData[]>>
 }

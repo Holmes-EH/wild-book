@@ -11,19 +11,23 @@ const Wilder = ({
 	grades,
 	setAddNewWilder,
 	setWilderToEdit,
+	wilders,
+	setWilders,
 }: IWilderProps) => {
 	const handleDelete = async () => {
 		await axios.delete('http://localhost:5000/api/wilders', {
 			data: { id: id },
 		})
+		setWilders(wilders.filter((wilder) => wilder.id !== id))
 	}
 	const handleEdit = () => {
 		setWilderToEdit({
-			id,
-			name,
-			city,
-			description,
-			grades,
+			isEditing: true,
+			editName: name,
+			editCity: city,
+			editDescription: description,
+			editGrades: grades,
+			editId: id,
 		})
 
 		setAddNewWilder(true)
@@ -34,7 +38,7 @@ const Wilder = ({
 			<img src={blank_profile} alt='Jane Doe Profile' />
 			<h3>{name}</h3>
 			<h4>{city}</h4>
-			<p>{description}</p>
+			<p style={{ flexGrow: '1' }}>{description}</p>
 			<h4>Wild Skills</h4>
 			<ul className='skills'>
 				{grades.map((grade, index) => {
@@ -48,8 +52,10 @@ const Wilder = ({
 					)
 				})}
 			</ul>
-			<button onClick={handleEdit}>Edit</button>
-			<button onClick={handleDelete}>Delete</button>
+			<div className='actions'>
+				<button onClick={handleEdit}>Edit</button>
+				<button onClick={handleDelete}>Delete</button>
+			</div>
 		</article>
 	)
 }

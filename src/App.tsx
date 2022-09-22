@@ -10,6 +10,25 @@ import {
 	IWilderToEdit,
 } from './interfaces/interfaces'
 
+export const refactorData = (data: IncomingWilder[]): IWilderData[] => {
+	return data.map((wilder: IncomingWilder) => {
+		const refactoredSkills = wilder.grades.map((grade) => {
+			return {
+				id: grade.skill.id,
+				title: grade.skill.title,
+				votes: grade.grade,
+			}
+		})
+		return {
+			id: wilder.id,
+			name: wilder.name,
+			city: wilder.city,
+			description: wilder.description,
+			grades: refactoredSkills,
+		}
+	})
+}
+
 const App = () => {
 	const [wilders, setWilders] = useState<IWilderData[]>([])
 	const [addNewWilder, setAddNewWilder] = useState(false)
@@ -20,25 +39,6 @@ const App = () => {
 		editDescription: '',
 		editGrades: [],
 	})
-
-	const refactorData = (data: IncomingWilder[]): IWilderData[] => {
-		return data.map((wilder: IncomingWilder) => {
-			const refactoredSkills = wilder.grades.map((grade) => {
-				return {
-					id: grade.id,
-					title: grade.skill.title,
-					votes: grade.grade,
-				}
-			})
-			return {
-				id: wilder.id,
-				name: wilder.name,
-				city: wilder.city,
-				description: wilder.description,
-				grades: refactoredSkills,
-			}
-		})
-	}
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -58,24 +58,33 @@ const App = () => {
 				</div>
 			</header>
 			<main className='container'>
-				<button
-					onClick={() => {
-						setWilderToEdit({
-							isEditing: false,
-							editName: '',
-							editCity: '',
-							editDescription: '',
-							editGrades: [],
-						})
-						setAddNewWilder(!addNewWilder)
-					}}
-				>
-					{addNewWilder ? 'Hide form' : 'Add new Wilder'}
-				</button>
+				<div className='topActions'>
+					<button
+						onClick={() => {
+							setWilderToEdit({
+								isEditing: false,
+								editName: '',
+								editCity: '',
+								editDescription: '',
+								editGrades: [],
+							})
+							setAddNewWilder(!addNewWilder)
+						}}
+					>
+						{addNewWilder
+							? 'Hide form'
+							: wilderToEdit.isEditing
+							? 'Save Wilder'
+							: 'Add new Wilder'}
+					</button>
+				</div>
 				{addNewWilder && (
 					<AddWilder
-						isEditing={Object.hasOwn(wilderToEdit, 'id')}
+						isEditing={Object.hasOwn(wilderToEdit, 'editId')}
 						setWilderToEdit={setWilderToEdit}
+						setAddNewWilder={setAddNewWilder}
+						wilders={wilders}
+						setWilders={setWilders}
 						editId={wilderToEdit.editId}
 						editName={wilderToEdit.editName}
 						editCity={wilderToEdit.editCity}
@@ -96,6 +105,8 @@ const App = () => {
 								grades={wilder.grades}
 								setAddNewWilder={setAddNewWilder}
 								setWilderToEdit={setWilderToEdit}
+								wilders={wilders}
+								setWilders={setWilders}
 							/>
 						)
 					})}

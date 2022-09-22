@@ -2,44 +2,71 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import styles from '../css/addWilder.module.css'
 import Skill from './Skill'
-import { ISkill, IWilderToEditToPass } from '../interfaces/interfaces'
+import {
+	ISkill,
+	IWilderData,
+	IWilderToEdit,
+	IWilderToEditToPass,
+} from '../interfaces/interfaces'
+
+import { refactorData } from '../App'
 
 const AddWilder = ({
 	isEditing,
 	setWilderToEdit,
+	setWilders,
+	setAddNewWilder,
+	wilders,
 	editId,
 	editName,
 	editCity,
 	editDescription,
 	editGrades,
 }: IWilderToEditToPass) => {
-	const [id] = useState(editId)
-	const [name, setName] = useState(editName || '')
-	const [city, setCity] = useState(editCity || '')
-	const [description, setDescription] = useState(editDescription || '')
+	const [id] = useState<IWilderToEdit['editId']>(editId)
+	const [name, setName] = useState<IWilderToEdit['editName']>(editName || '')
+	const [city, setCity] = useState<IWilderToEdit['editCity']>(editCity || '')
+	const [description, setDescription] = useState<
+		IWilderToEdit['editDescription']
+	>(editDescription || '')
 	const [skills, setSkills] = useState<ISkill[]>([])
 
 	const [wildersGrades, setWildersGrades] = useState<ISkill[]>(
-		isEditing ? editGrades : []
+		editGrades || []
 	)
+	// console.log(wildersGrades)
+
 	const [addingNewGrade, setAddingNewGrade] = useState(false)
 	const [newGradeGrade, setNewGradeGrade] = useState(0)
 	const [newGradeId, setNewGradeId] = useState(0)
 
 	const handleAddGrade = () => {
-		const newGradeToAdd = skills.filter((el) => el.id === newGradeId)[0]
-		if (newGradeToAdd !== null) {
+		const newSkillToAdd = skills.filter((el) => el.id === newGradeId)[0]
+		if (newSkillToAdd !== null) {
 			const newGrade = {
 				votes: newGradeGrade,
-				title: newGradeToAdd.title,
-				id: newGradeToAdd.id,
+				title: newSkillToAdd.title,
+				id: newSkillToAdd.id,
 			}
-			console.log(newGrade)
 
-			setWildersGrades([...wildersGrades, newGrade])
-			setAddingNewGrade(false)
-			setNewGradeGrade(0)
-			setNewGradeId(0)
+			const exisitingGrade = wildersGrades.filter(
+				(grade) => grade.id === newSkillToAdd.id
+			)
+			if (exisitingGrade.length > 0) {
+				console.log(exisitingGrade)
+
+				const updatedGrade = exisitingGrade[0]
+				updatedGrade.votes = newGradeGrade
+				const updatedGrades = wildersGrades.filter(
+					(grade) => grade.id !== newSkillToAdd.id
+				)
+				setWildersGrades([...updatedGrades, updatedGrade])
+			} else {
+				setWildersGrades([...wildersGrades, newGrade])
+				setAddingNewGrade(false)
+				setNewGradeGrade(0)
+				setNewGradeId(0)
+			}
 		}
 	}
 
@@ -59,6 +86,7 @@ const AddWilder = ({
 				grade: grade.votes,
 			}
 		})
+
 		if (isEditing) {
 			try {
 				const { data } = await axios.put(
@@ -71,7 +99,13 @@ const AddWilder = ({
 						grades: gradesToSend,
 					}
 				)
-				console.log(data)
+				const { updatedWilder } = data
+
+				const newWilderList: IWilderData[] = wilders.filter(
+					(wilder) => wilder.id !== updatedWilder.id
+				)
+				newWilderList.push(refactorData([updatedWilder])[0])
+				setWilders(newWilderList)
 			} catch (error) {
 				console.log(error)
 			}
@@ -86,13 +120,25 @@ const AddWilder = ({
 						grades: gradesToSend,
 					}
 				)
-				console.log(data)
+				const { newWilder } = data
+
+				const newWilderList: IWilderData[] = [
+					...wilders,
+					refactorData([newWilder])[0],
+				]
+				setWilders(newWilderList)
 			} catch (error) {
 				console.log(error)
 			}
 		}
-		setWilderToEdit({})
-		// window.location.reload()
+		setWilderToEdit({
+			isEditing: false,
+			editName: '',
+			editCity: '',
+			editDescription: '',
+			editGrades: [],
+		})
+		setAddNewWilder(false)
 	}
 
 	return (
@@ -135,9 +181,9 @@ const AddWilder = ({
 					onChange={(e) => setDescription(e.target.value)}
 				></textarea>
 			</fieldset>
-			<h4>Skills</h4>
-			<ul className='skills'>
-				{wildersGrades.map((grade, index) => {
+			<h4>Wild Skills</h4>
+			<ul className='skills' style={{ gap: '7px' }}>
+				{wildersGrades.map((grade) => {
 					return (
 						<Skill
 							key={`${name}-skill-${grade.id}`}
@@ -151,11 +197,18 @@ const AddWilder = ({
 				onClick={() => {
 					setAddingNewGrade(!addingNewGrade)
 				}}
+				className={styles.actionButton}
 			>
 				Add new skill
 			</button>
 			{addingNewGrade && (
-				<div style={{ display: 'flex', gap: '10px' }}>
+				<div
+					style={{
+						display: 'flex',
+						gap: '10px',
+						alignItems: 'center',
+					}}
+				>
 					<select
 						name='skill'
 						value={newGradeId}
@@ -192,13 +245,17 @@ const AddWilder = ({
 
 					<button
 						onClick={handleAddGrade}
-						disabled={newGradeGrade === 0}
+						disabled={newGradeGrade === 0 || newGradeId === 0}
+						className={styles.actionButton}
+						style={{ margin: '0' }}
 					>
 						Addskill
 					</button>
 				</div>
 			)}
-			<button onClick={handleSubmit}>Save Wilder</button>
+			<button onClick={handleSubmit} className={styles.actionButton}>
+				Save Wilder
+			</button>
 		</form>
 	)
 }
