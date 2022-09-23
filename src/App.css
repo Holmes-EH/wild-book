@@ -35,7 +35,6 @@ h4 {
 p {
 	margin: 0 0 1.15em;
 }
-
 .container {
 	max-width: 800px;
 	margin-left: auto;
@@ -46,6 +45,20 @@ p {
 header {
 	background-color: #f76c6c;
 	color: #fff;
+}
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.links {
+	display: flex;
+	gap: 30px;
+}
+.links a {
+	text-decoration: none;
+	color: #fff;
+	font-weight: bolder;
 }
 
 footer {

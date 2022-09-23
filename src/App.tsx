@@ -9,6 +9,7 @@ import {
 	IWilderData,
 	IWilderToEdit,
 } from './interfaces/interfaces'
+import { Route, Routes } from 'react-router-dom'
 
 export const refactorData = (data: IncomingWilder[]): IWilderData[] => {
 	return data.map((wilder: IncomingWilder) => {
@@ -50,14 +51,9 @@ const App = () => {
 		fetchData()
 	}, [])
 
-	return (
-		<div>
-			<header>
-				<div className='container'>
-					<h1>Wilders Book</h1>
-				</div>
-			</header>
-			<main className='container'>
+	const Home = () => {
+		return (
+			<>
 				<div className='topActions'>
 					<button
 						onClick={() => {
@@ -111,6 +107,26 @@ const App = () => {
 						)
 					})}
 				</section>
+			</>
+		)
+	}
+
+	return (
+		<div>
+			<header>
+				<div className='container header'>
+					<h1>Wilders Book</h1>
+					<div className='links'>
+						<a href='/'>Home</a>
+						<a href='/skills'>Skills</a>
+					</div>
+				</div>
+			</header>
+			<main className='container'>
+				<Routes>
+					<Route path='/' element={<Home />} />
+					<Route path='skills' element={<SkillsList />} />
+				</Routes>
 			</main>
 			<footer>
 				<div className='container'>
