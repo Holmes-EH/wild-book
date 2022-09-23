@@ -2,7 +2,7 @@ POST http://localhost:5000/api/wilders
 Content-Type: application/json
 
 {
-    "name" : "Jane Doe",
+    "name" : "Jack",
     "city" : "Codesvile",
     "description" : "Lipsum",
     "grades" : [ {
@@ -35,22 +35,22 @@ Content-Type: application/json
     "city": "TypeVille",
     "grades" : [
     {
-        "id": 3,
+        "id": 1,
         "title": "Typescript",
         "grade": 23
     },
     {
-        "id": 4,
+        "id": 2,
         "title": "Javascript",
         "grade": 53
     },
     {
-        "id": 1,
+        "id": 3,
         "title": "Python",
         "grade": 10
     },
     {
-        "id": 2,
+        "id": 4,
         "title": "Rust",
         "grade": 600
     }

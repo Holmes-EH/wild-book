@@ -9,7 +9,9 @@ const skillRepository = AppDataSource.getRepository(Skill)
 const skillController: IController = {
 	create: async (req, res) => {
 		try {
-			await skillRepository.save(req.body)
+			const { skills } = req.body
+
+			await skillRepository.save(skills)
 			res.status(201).send('Skill Created !')
 		} catch (error) {
 			console.error('Error ->', error)

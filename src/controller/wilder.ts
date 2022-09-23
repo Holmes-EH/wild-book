@@ -2,6 +2,7 @@
 import AppDataSource from '../utils'
 import {
 	IController,
+	IGrade,
 	IIncomingGrade,
 	IIncomingWilder,
 } from '../interfaces/interfaces'
@@ -28,9 +29,9 @@ const wilderController: IController = {
 			if (wilderExists !== null) {
 				res.status(400).send('Wilder exists, consider updating !')
 			} else {
-				const savedWilder = await wilderRepository.save(newWilder)
-				const wilder = await wilderRepository.save(savedWilder)
+				const wilder = await wilderRepository.save(newWilder)
 				if (wilder !== null) {
+					const newGrades: IGrade[] = []
 					await Promise.all(
 						grades.map(async (grade: IIncomingGrade) => {
 							const skillToAdd = await skillRepository.findOneBy({
@@ -41,13 +42,14 @@ const wilderController: IController = {
 								newGrade.wilder = wilder
 								newGrade.skill = skillToAdd
 								newGrade.grade = grade.grade
-								await gradeRepository.save(newGrade)
+								newGrades.push(newGrade)
 							}
 						})
 					)
+					await gradeRepository.save(newGrades)
 					const newWilder = await wilderRepository.findOne({
 						where: {
-							id: savedWilder.id,
+							id: wilder.id,
 						},
 						relations: {
 							grades: {
@@ -105,12 +107,14 @@ const wilderController: IController = {
 					wilderToUpdate.city = city
 					wilderToUpdate.description = description
 					await wilderRepository.save(wilderToUpdate)
+					const newGrades: IGrade[] = []
 					await Promise.all(
 						grades.map(async (incomingGrade: IIncomingGrade) => {
 							const gradeToUpdate = await gradeRepository.findOne(
 								{
 									where: {
 										skillId: incomingGrade.id,
+										wilderId: wilderToUpdate.id,
 									},
 								}
 							)
@@ -127,11 +131,12 @@ const wilderController: IController = {
 									newGrade.wilder = wilderToUpdate
 									newGrade.skill = skillToAdd
 									newGrade.grade = incomingGrade.grade
-									await gradeRepository.save(newGrade)
+									newGrades.push(newGrade)
 								}
 							}
 						})
 					)
+					await gradeRepository.save(newGrades)
 					const updatedWilder = await wilderRepository.findOne({
 						where: {
 							id,
