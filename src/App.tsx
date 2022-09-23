@@ -10,6 +10,7 @@ import {
 	IWilderToEdit,
 } from './interfaces/interfaces'
 import { Route, Routes } from 'react-router-dom'
+import SkillsList from './components/SkillsList'
 
 export const refactorData = (data: IncomingWilder[]): IWilderData[] => {
 	return data.map((wilder: IncomingWilder) => {
