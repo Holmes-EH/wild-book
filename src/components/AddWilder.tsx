@@ -101,10 +101,12 @@ const AddWilder = ({
 				)
 				const { updatedWilder } = data
 
-				const newWilderList: IWilderData[] = wilders.filter(
-					(wilder) => wilder.id !== updatedWilder.id
-				)
-				newWilderList.push(refactorData([updatedWilder])[0])
+				const newWilderList = [...wilders]
+				newWilderList[
+					wilders.findIndex(
+						(wilder) => wilder.id === updatedWilder.id
+					)
+				] = updatedWilder
 				setWilders(newWilderList)
 			} catch (error) {
 				console.log(error)
