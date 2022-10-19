@@ -3,7 +3,7 @@ import { Skill } from './entity/Skill'
 import { Wilder } from './entity/Wilder'
 import { Grade } from './entity/Grade'
 
-const AppDataSource = new DataSource({
+const dataSource = new DataSource({
 	type: 'sqlite',
 	database: './wildersdb.sqlite',
 	synchronize: true,
@@ -11,4 +11,4 @@ const AppDataSource = new DataSource({
 	logging: ['error'],
 })
 
-export default AppDataSource
+export default dataSource
