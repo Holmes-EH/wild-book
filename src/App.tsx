@@ -1,9 +1,8 @@
-import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import Wilder from './components/Wilder'
 import AddWilder from './components/AddWilder'
-
+import { useQuery, gql } from '@apollo/client'
 import {
 	IncomingWilder,
 	IWilderData,
@@ -16,7 +15,7 @@ export const refactorData = (data: IncomingWilder[]): IWilderData[] => {
 	return data.map((wilder: IncomingWilder) => {
 		const refactoredSkills = wilder.grades.map((grade) => {
 			return {
-				id: grade.skill.id,
+				id: grade.id,
 				title: grade.skill.title,
 				votes: grade.grade,
 			}
@@ -31,8 +30,25 @@ export const refactorData = (data: IncomingWilder[]): IWilderData[] => {
 	})
 }
 
+export const GET_WILDERS = gql`
+	query getAllWilders {
+		getAllWilders {
+			id
+			name
+			description
+			city
+			grades {
+				id
+				grade
+				skill {
+					title
+				}
+			}
+		}
+	}
+`
+
 const App = () => {
-	const [wilders, setWilders] = useState<IWilderData[]>([])
 	const [addNewWilder, setAddNewWilder] = useState(false)
 	const [wilderToEdit, setWilderToEdit] = useState<IWilderToEdit>({
 		isEditing: false,
@@ -42,15 +58,10 @@ const App = () => {
 		editGrades: [],
 	})
 
-	useEffect(() => {
-		const fetchData = async () => {
-			const { data } = await axios.get(
-				'http://localhost:5000/api/wilders'
-			)
-			setWilders(refactorData(data))
-		}
-		fetchData()
-	}, [])
+	const { loading, error, data } = useQuery(GET_WILDERS)
+
+	if (loading) return <p>Loading...</p>
+	if (error) return <p>Error :(</p>
 
 	const Home = () => {
 		return (
@@ -80,8 +91,7 @@ const App = () => {
 						isEditing={Object.hasOwn(wilderToEdit, 'editId')}
 						setWilderToEdit={setWilderToEdit}
 						setAddNewWilder={setAddNewWilder}
-						wilders={wilders}
-						setWilders={setWilders}
+						wilders={refactorData(data.getAllWilders)}
 						editId={wilderToEdit.editId}
 						editName={wilderToEdit.editName}
 						editCity={wilderToEdit.editCity}
@@ -91,22 +101,23 @@ const App = () => {
 				)}
 				<h2>Wilders</h2>
 				<section className='card-row'>
-					{wilders.map((wilder, index) => {
-						return (
-							<Wilder
-								key={`wilder-${index}`}
-								id={wilder.id}
-								name={wilder.name}
-								city={wilder.city}
-								description={wilder.description}
-								grades={wilder.grades}
-								setAddNewWilder={setAddNewWilder}
-								setWilderToEdit={setWilderToEdit}
-								wilders={wilders}
-								setWilders={setWilders}
-							/>
-						)
-					})}
+					{refactorData(data.getAllWilders).map(
+						(wilder: IWilderData, index: number) => {
+							return (
+								<Wilder
+									key={`wilder-${index}`}
+									id={wilder.id}
+									name={wilder.name}
+									city={wilder.city}
+									description={wilder.description}
+									grades={wilder.grades}
+									setAddNewWilder={setAddNewWilder}
+									setWilderToEdit={setWilderToEdit}
+									wilders={refactorData(data.getAllWilders)}
+								/>
+							)
+						}
+					)}
 				</section>
 			</>
 		)

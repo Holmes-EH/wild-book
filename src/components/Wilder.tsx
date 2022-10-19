@@ -1,7 +1,14 @@
 import blank_profile from '../assets/blank_profile.png'
 import Skill from './Skill'
 import { IWilderProps } from '../interfaces/interfaces'
-import axios from 'axios'
+import { useMutation, gql } from '@apollo/client'
+import { GET_WILDERS } from '../App'
+
+const DELETE_WILDER = gql`
+	mutation deleteWilder($deleteWilderId: Float!) {
+		deleteWilder(id: $deleteWilderId)
+	}
+`
 
 const Wilder = ({
 	id,
@@ -11,14 +18,12 @@ const Wilder = ({
 	grades,
 	setAddNewWilder,
 	setWilderToEdit,
-	wilders,
-	setWilders,
 }: IWilderProps) => {
+	const [deleteWilder] = useMutation(DELETE_WILDER, {
+		refetchQueries: [{ query: GET_WILDERS }, 'getAllWilders'],
+	})
 	const handleDelete = async () => {
-		await axios.delete('http://localhost:5000/api/wilders', {
-			data: { id: id },
-		})
-		setWilders(wilders.filter((wilder) => wilder.id !== id))
+		deleteWilder({ variables: { deleteWilderId: id } })
 	}
 	const handleEdit = () => {
 		setWilderToEdit({

@@ -1,20 +1,63 @@
-import { useEffect, useState } from 'react'
-import axios from 'axios'
+import { useState } from 'react'
+import { useQuery, useMutation, gql } from '@apollo/client'
 import styles from '../css/addWilder.module.css'
 import Skill from './Skill'
 import {
 	ISkill,
-	IWilderData,
 	IWilderToEdit,
 	IWilderToEditToPass,
 } from '../interfaces/interfaces'
 
-import { refactorData } from '../App'
+import { GET_WILDERS } from '../App'
+
+const GET_SKILLS = gql`
+	query getAllSkills {
+		getAllSkills {
+			id
+			title
+		}
+	}
+`
+
+const UPDATE_WILDER = gql`
+	mutation updateWilder($data: UpdateWilderInput!) {
+		updateWilder(data: $data) {
+			id
+			name
+			city
+			description
+			grades {
+				grade
+				skill {
+					id
+					title
+				}
+			}
+		}
+	}
+`
+
+const CREATE_NEW_WILDER = gql`
+	mutation addNewWilder($data: AddWilderInput!) {
+		addNewWilder(data: $data) {
+			id
+			name
+			description
+			city
+			grades {
+				grade
+				skill {
+					title
+					id
+				}
+			}
+		}
+	}
+`
 
 const AddWilder = ({
 	isEditing,
 	setWilderToEdit,
-	setWilders,
 	setAddNewWilder,
 	wilders,
 	editId,
@@ -29,19 +72,30 @@ const AddWilder = ({
 	const [description, setDescription] = useState<
 		IWilderToEdit['editDescription']
 	>(editDescription || '')
-	const [skills, setSkills] = useState<ISkill[]>([])
 
 	const [wildersGrades, setWildersGrades] = useState<ISkill[]>(
 		editGrades || []
 	)
-	// console.log(wildersGrades)
 
 	const [addingNewGrade, setAddingNewGrade] = useState(false)
 	const [newGradeGrade, setNewGradeGrade] = useState(0)
 	const [newGradeId, setNewGradeId] = useState(0)
 
+	const [updateWilder] = useMutation(UPDATE_WILDER, {
+		refetchQueries: [{ query: GET_WILDERS }, 'getAllWilders'],
+	})
+
+	const [createNewWilder] = useMutation(CREATE_NEW_WILDER, {
+		refetchQueries: [{ query: GET_WILDERS }, 'getAllWilders'],
+	})
+
+	const { loading, error, data } = useQuery(GET_SKILLS)
+
 	const handleAddGrade = () => {
-		const newSkillToAdd = skills.filter((el) => el.id === newGradeId)[0]
+		const newSkillToAdd = data.getAllSkills.filter(
+			(el: ISkill) => el.id === newGradeId
+		)[0]
+
 		if (newSkillToAdd !== null) {
 			const newGrade = {
 				votes: newGradeGrade,
@@ -53,8 +107,6 @@ const AddWilder = ({
 				(grade) => grade.id === newSkillToAdd.id
 			)
 			if (exisitingGrade.length > 0) {
-				console.log(exisitingGrade)
-
 				const updatedGrade = exisitingGrade[0]
 				updatedGrade.votes = newGradeGrade
 				const updatedGrades = wildersGrades.filter(
@@ -70,68 +122,38 @@ const AddWilder = ({
 		}
 	}
 
-	useEffect(() => {
-		const getSkills = async () => {
-			const { data } = await axios.get('http://localhost:5000/api/skills')
-			setSkills(data)
-		}
-		getSkills()
-	}, [])
-
-	const handleSubmit = async () => {
+	const handleSubmit = async (e: any) => {
+		e.preventDefault()
 		const gradesToSend = wildersGrades.map((grade) => {
 			return {
-				id: grade.id,
-				title: grade.title,
+				skillId: grade.id,
 				grade: grade.votes,
 			}
 		})
 
 		if (isEditing) {
-			try {
-				const { data } = await axios.put(
-					'http://localhost:5000/api/wilders',
-					{
+			updateWilder({
+				variables: {
+					data: {
 						id,
 						name,
 						city,
 						description,
 						grades: gradesToSend,
-					}
-				)
-				const { updatedWilder } = data
-
-				const newWilderList = [...wilders]
-				newWilderList[
-					wilders.findIndex(
-						(wilder) => wilder.id === updatedWilder.id
-					)
-				] = updatedWilder
-				setWilders(newWilderList)
-			} catch (error) {
-				console.log(error)
-			}
+					},
+				},
+			})
 		} else {
-			try {
-				const { data } = await axios.post(
-					'http://localhost:5000/api/wilders',
-					{
+			createNewWilder({
+				variables: {
+					data: {
 						name,
 						city,
 						description,
 						grades: gradesToSend,
-					}
-				)
-				const { newWilder } = data
-
-				const newWilderList: IWilderData[] = [
-					...wilders,
-					refactorData([newWilder])[0],
-				]
-				setWilders(newWilderList)
-			} catch (error) {
-				console.log(error)
-			}
+					},
+				},
+			})
 		}
 		setWilderToEdit({
 			isEditing: false,
@@ -142,6 +164,9 @@ const AddWilder = ({
 		})
 		setAddNewWilder(false)
 	}
+
+	if (loading) return <p>Loading...</p>
+	if (error) return <p>Error :(</p>
 
 	return (
 		<form
@@ -225,7 +250,7 @@ const AddWilder = ({
 							{' '}
 							Choose a skill{' '}
 						</option>
-						{skills.map((skill) => {
+						{data.getAllSkills.map((skill: ISkill) => {
 							return (
 								<option
 									key={'option-' + skill.title}
@@ -258,7 +283,10 @@ const AddWilder = ({
 					</button>
 				</div>
 			)}
-			<button onClick={handleSubmit} className={styles.actionButton}>
+			<button
+				onClick={(e) => handleSubmit(e)}
+				className={styles.actionButton}
+			>
 				Save Wilder
 			</button>
 		</form>
