@@ -157,6 +157,7 @@ const AddWilder = ({
 					type='text'
 					title='name'
 					value={name}
+					required
 					onChange={(e) => setName(e.target.value)}
 				/>
 			</fieldset>
@@ -169,6 +170,7 @@ const AddWilder = ({
 					type='text'
 					title='city'
 					value={city}
+					required
 					onChange={(e) => setCity(e.target.value)}
 				/>
 			</fieldset>
@@ -180,6 +182,7 @@ const AddWilder = ({
 					value={description}
 					cols={30}
 					rows={10}
+					required
 					onChange={(e) => setDescription(e.target.value)}
 				></textarea>
 			</fieldset>
