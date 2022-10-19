@@ -1,44 +1,26 @@
-import express, { Request, Response } from 'express'
-import cors from 'cors'
-import AppDataSource from './utils'
-import wilderController from './controller/wilder'
-import skillController from './controller/skill'
-import gradeController from './controller/grade'
+import 'reflect-metadata'
+import { ApolloServer } from 'apollo-server'
+import { buildSchema } from 'type-graphql'
+import { WilderResolver } from './resolvers/wilderResolver'
+import { SkillResolver } from './resolvers/skillResolver'
+import { GradeResolver } from './resolvers/gradeResolver'
+import datasource from './utils'
 
-const app = express()
 const port = 5000
 
-app.use(express.json())
-app.use(cors())
-
-app.get('/api', (req: Request, res: Response) => {
-	res.send('Hello World!')
-})
-
-// Wilder routes
-app.post('/api/wilders', wilderController.create)
-app.get('/api/wilders', wilderController.findAll)
-app.put('/api/wilders', wilderController.update)
-
-app.post('/api/wilders/addSkill', gradeController.noteSkill)
-
-app.delete('/api/wilders', wilderController.delete)
-
-// Skill Routes
-app.post('/api/skills', skillController.create)
-app.get('/api/skills', skillController.findAll)
-app.put('/api/skills', skillController.update)
-app.delete('/api/skills', skillController.delete)
-
-app.use((req: Request, res: Response, next) => {
-	res.status(404).send('Route does not exist...')
-})
-
 const start = async (): Promise<void> => {
-	await AppDataSource.initialize()
-	app.listen(port, () => {
-		console.log(`Example app listening on port ${port}`)
+	await datasource.initialize()
+	const schema = await buildSchema({
+		resolvers: [WilderResolver, SkillResolver, GradeResolver],
 	})
+	const server = new ApolloServer({ schema })
+
+	try {
+		const { url }: { url: string } = await server.listen({ port })
+		console.log(`🚀  Server ready at ${url}`)
+	} catch (error) {
+		console.error('Error starting the server')
+	}
 }
 
 void start()
