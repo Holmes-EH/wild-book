@@ -1,0 +1,9 @@
+###
+PUT http://localhost:3000/api/wilders/noteSkill
+Content-Type: application/json
+
+{
+    "wilderId" : 1,
+    "skillId" : 1,
+    "grade" : 4
+}
