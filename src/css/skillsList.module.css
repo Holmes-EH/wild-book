@@ -1,0 +1,36 @@
+.topActions {
+	display: flex;
+	justify-content: space-between;
+}
+.saveButton {
+	background-color: #f76c6c;
+	color: #fff;
+}
+
+.saveButton:hover {
+	color: #f76c6c;
+	background-color: #fff;
+}
+
+.addButton:disabled {
+	background-color: lightgray;
+	color: gray;
+	outline-color: lightgray;
+	pointer-events: none;
+}
+
+.inputs {
+	display: flex;
+	flex-direction: column;
+}
+.inputs input {
+	display: list-item;
+	list-style-position: inside;
+	border: none;
+	padding: 1em;
+	margin-left: 1em;
+	position: relative;
+}
+.newSkillInput {
+	margin-left: 1em;
+}
