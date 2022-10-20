@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import Wilder from './components/Wilder'
 import AddWilder from './components/AddWilder'
-import { useQuery, gql } from '@apollo/client'
+import { useQuery, gql, useApolloClient } from '@apollo/client'
 import {
 	IncomingWilder,
 	IWilderData,
@@ -58,6 +58,12 @@ const App = () => {
 		editGrades: [],
 	})
 
+	const client = useApolloClient()
+	const testCache = () => {
+		const cache = client.readQuery({ query: GET_WILDERS })
+		console.log(cache)
+	}
+
 	const { loading, error, data } = useQuery(GET_WILDERS)
 
 	if (loading) return <p>Loading...</p>
@@ -67,6 +73,8 @@ const App = () => {
 		return (
 			<>
 				<div className='topActions'>
+					<button onClick={testCache}>Test Cache</button>
+
 					<button
 						onClick={() => {
 							setWilderToEdit({

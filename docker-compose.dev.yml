@@ -6,9 +6,18 @@ services:
         volumes:
             - ./back/data/:/app/data/
             - ./back/src/:/app/src/
+        healthcheck:
+            test: 'curl --request POST  --header ''content-type: application/json'' --url http://localhost:5000/ --data ''{"query":"query { __typename }"}'''
+            interval: 2s
+            timeout: 10s
+            retries: 5
+            start_period: 3s
     client:
         build: ./front
         ports:
             - 3000:3000
         volumes:
             - ./front/src/:/app/src/
+        depends_on:
+            'backend':
+                condition: service_healthy
