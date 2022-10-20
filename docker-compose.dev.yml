@@ -1,0 +1,14 @@
+services:
+    backend:
+        build: ./back
+        ports:
+            - 5000:5000
+        volumes:
+            - ./back/data/:/app/data/
+            - ./back/src/:/app/src/
+    client:
+        build: ./front
+        ports:
+            - 3000:3000
+        volumes:
+            - ./front/src/:/app/src/

@@ -5,7 +5,7 @@ import { Grade } from './entity/Grade'
 
 const dataSource = new DataSource({
 	type: 'sqlite',
-	database: './wildersdb.sqlite',
+	database: './data/wildersdb.sqlite',
 	synchronize: true,
 	entities: [Wilder, Skill, Grade],
 	logging: ['error'],
