@@ -1,5 +1,32 @@
 services:
     backend:
-        build: ./wild-book-back
+        container_name: wild-book-backend
+        restart: always
+        build:
+            context: ./back
+            dockerfile: Dockerfile.prod
         ports:
             - 5000:5000
+        volumes:
+            - ./back/data/:/app/data/
+        command: [sh, -cx, 'node dist/index.js']
+        healthcheck:
+            test: 'curl --request POST  --header ''content-type: application/json'' --url http://localhost:5000/ --data ''{"query":"query { __typename }"}'''
+            interval: 2s
+            timeout: 10s
+            retries: 5
+            start_period: 2s
+    client:
+        container_name: wild-book-frontend
+        build: ./front
+        ports:
+            - 80:3000
+        depends_on:
+            'backend':
+                condition: service_healthy
+        command:
+            [
+                sh,
+                -cx,
+                'npm run build --production && npm install -g serve && serve -s build',
+            ]

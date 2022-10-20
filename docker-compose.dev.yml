@@ -1,8 +1,10 @@
 services:
     backend:
+        container_name: wild-book-backend
         build: ./back
         ports:
             - 5000:5000
+        command: npm run dev
         volumes:
             - ./back/data/:/app/data/
             - ./back/src/:/app/src/
@@ -13,6 +15,7 @@ services:
             retries: 5
             start_period: 3s
     client:
+        container_name: wild-book-frontend
         build: ./front
         ports:
             - 3000:3000
