@@ -9,7 +9,6 @@ COPY package-lock.json package-lock.json
 RUN npm i
 
 COPY src src
-COPY data/wildersdb.sqlite data/wildersdb.sqlite
 COPY tsconfig.json tsconfig.json
 
 CMD npm start
