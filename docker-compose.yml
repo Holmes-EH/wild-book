@@ -1,21 +1,52 @@
 services:
+    db:
+        image: postgres
+        restart: always
+        # Maybe this volume should be adjusted before hosting ?
+        volumes:
+            - ./data:/var/lib/postgresql/data
+        ports:
+            - 50000:5432
+        environment:
+            POSTGRES_PASSWORD: example
+            PGDATA: /var/lib/postgresql/data/pgdata
+            PGUSER: postgres
+            POSTGRES_DB: postgres
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready']
+            interval: 5s
+            timeout: 5s
+            retries: 10
     backend:
-        container_name: wild-book-backend
+        container_name: wild-book-backend-prod
         restart: always
         build:
             context: ./back
             dockerfile: Dockerfile.prod
         ports:
             - 5000:5000
-        volumes:
-            - ./back/data/:/app/data/
         command: [sh, -cx, 'node dist/index.js']
+        depends_on:
+            'db':
+                condition: service_healthy
         healthcheck:
-            test: 'curl --request POST  --header ''content-type: application/json'' --url http://localhost:5000/ --data ''{"query":"query { __typename }"}'''
-            interval: 2s
+            test:
+                [
+                    'CMD',
+                    'curl',
+                    '--request',
+                    'POST',
+                    '--header',
+                    "'content-type: application/json'",
+                    '--url',
+                    'http://localhost:5000/',
+                    '--data',
+                    '{"query":"query { __typename }"}',
+                ]
+            interval: 5s
             timeout: 10s
-            retries: 5
-            start_period: 2s
+            retries: 10
+            start_period: 10s
     client:
         container_name: wild-book-frontend
         build: ./front
